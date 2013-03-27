@@ -3,3 +3,5 @@
 - Add DELETE functionality and methods. - DONE
 - Clean up commenting. - DONE
 - Better documentation.
+- Unit tests
+- Exception handling

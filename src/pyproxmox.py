@@ -19,6 +19,7 @@ status = b.getClusterStatus('vnode01')
 For more information see https://github.com/Daemonthread/pyproxmox.
 """
 import json
+import sys
 import requests
 
 # Authentication class
@@ -38,13 +39,28 @@ class prox_auth:
         self.url = url
         self.connect_data = { "username":username, "password":password }
         self.full_url = "https://%s:8006/api2/json/access/ticket" % (self.url)
+        self.ticket = {}
+        self.CSRF = {}
 
-        self.response = requests.post(self.full_url,verify=False,data=self.connect_data)
+        try:
+            self.response = requests.post(self.full_url,verify=False,data=self.connect_data)
+            self.response.raise_for_status()
+            self.returned_data = self.response.json()
+            self.ticket = {'PVEAuthCookie':self.returned_data['data']['ticket']}
+            self.CSRF = self.returned_data['data']['CSRFPreventionToken']
+        except requests.HTTPError as e:
+            print("Authentication error:")
+            print(e)
+        except requests.exceptions.ConnectionError as e:
+            print("Unable to connect to " + self.full_url)
+            print(e)
+        except :
+            e = sys.exc_info()[0]
+            print("Unexpected exception at connection occured")
+            print(e)
+            raise
+
     
-        self.returned_data = self.response.json()
-        
-        self.ticket = {'PVEAuthCookie':self.returned_data['data']['ticket']}
-        self.CSRF = self.returned_data['data']['CSRFPreventionToken']
 
 # The meat and veg class
 class pyproxmox:

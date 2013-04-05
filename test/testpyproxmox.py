@@ -7,4 +7,5 @@ a = prox_auth('pnode01','apiuser@pve', 'apipasswd')
 b = pyproxmox(a)
 
 status = b.getClusterStatus()
+
 print(status)

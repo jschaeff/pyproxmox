@@ -114,8 +114,10 @@ class pyproxmox:
             self.returned_data = self.response.json()
             return self.returned_data
         except:
-            print("Error in trying to process JSON")
-            print(self.response)
+            e = sys.exc_info()[0]
+            print("Unexpected exception at connection occured")
+            print(e)
+            raise
 
 
     """
@@ -440,7 +442,13 @@ class pyproxmox:
     def migrateVirtualMachine(self,node,vmid,target):
         """Migrate a virtual machine. Returns JSON"""
         post_data = {'target', str(target)}
-        data = self.connect('post',"nodes/%s/qemu/%s/status/start" % (node,vmid), post_data)
+        data = self.connect('post',"nodes/%s/qemu/%s/migrate" % (node,vmid), post_data)
+        return data
+
+    def migrateVirtualMachineOnline(self,node,vmid,target):
+        """Migrate a virtual machine online. Returns JSON"""
+        post_data = {'target':str(target), 'online':'1'}
+        data = self.connect('post','nodes/%s/qemu/%s/migrate' % (node,vmid),post_data)
         return data
 
     def monitorVirtualMachine(self,node,vmid,command):
@@ -467,7 +475,6 @@ class pyproxmox:
         data = self.connect('get',"nodes/%s/qemu/%s/snapshot/%s/config" % (node,vmid,snapname), post_data)
         return data
 
-        
     """
     Methods using the DELETE protocol to communicate with the Proxmox API. 
     """

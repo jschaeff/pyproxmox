@@ -135,7 +135,10 @@ class pyproxmox:
         data = self.connect('get','cluster/backup',None)
         return data
 
-
+    def getNodes(self):
+        """List nodes in the cluster"""
+        data = self.connect('get','nodes/',None)
+        return data
 
     # Node Methods
     def getNodeNetworks(self,node):
